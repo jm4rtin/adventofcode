@@ -1,0 +1,35 @@
+name: Advent of Code Tests
+on: [push]
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest
+    name: Run Advent of Code Tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: tcl
+          version: 1.0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Display Python version
+        run: python -c "import sys; print(sys.version)"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Test with pytest
+        run: |
+          HOME=`pwd`
+
+          while read dir; do
+            cd "${HOME}/${dir}" && python -m pytest
+          done < <(find -mindepth 1 -maxdepth 1 -type d -not -path '*/.*')
